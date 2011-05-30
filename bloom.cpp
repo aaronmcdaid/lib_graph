@@ -1,6 +1,5 @@
 #include "bloom.hpp"
 #include <tr1/unordered_set>
-#include "../pp.hpp"
 namespace graph {
 namespace bloom {
 // a Bloom filter to speed up VerySimpleGraphInterface :: are_connected(int32_t node_id1, int32_t node_id2)

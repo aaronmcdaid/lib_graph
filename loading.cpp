@@ -1,13 +1,14 @@
 #include"loading.hpp"
 
 #include"saving.hpp"
-#include"../pp.hpp"
 
 #define USE_BLOOM_FILTER
 #ifdef USE_BLOOM_FILTER
 #include"bloom.hpp"
 #include <tr1/unordered_set>
 #endif
+
+#include"macros.hpp"
 
 #include <iostream>
 #include <fstream>
