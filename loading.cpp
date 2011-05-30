@@ -16,6 +16,7 @@
 #include <set>
 #include <limits>
 #include <algorithm>
+#include <stdexcept>
 
 using namespace std;
 
@@ -147,6 +148,9 @@ static ThreeStrings parseLine(const string &lineOrig) {
 	return t;
 }
 
+struct EmptyOrMissingFile : public std :: exception {
+};
+
 template <class NodeNameT>
 static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_network, const string file_name) {
 	assert(modifiable_network && modifiable_network->ordered_node_names.empty());
@@ -159,6 +163,9 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 	typedef typename NodeNameT :: value_type t;
 	{ // first pass: just store the node names
 		ifstream f(file_name.c_str(), ios_base :: in | ios_base :: binary);
+		if(!f.good()) {
+			throw EmptyOrMissingFile();
+		}
 		string line;
 		set<t> set_of_node_names; // This will store all the node names.
 		while( getline(f, line) ) {
