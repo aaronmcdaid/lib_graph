@@ -29,11 +29,11 @@ static const bool verbose = false;
 template <class NodeNameT>
 struct ModifiableNetwork;
 template <class NodeNameT>
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *network, const string file_name, const bool skip_self_loops);
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameT>        *network, const string file_name, const bool skip_self_loops, const vector<typename NodeNameT :: value_type> &);
 template
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsInt64> *network, const string file_name, const bool skip_self_loops);
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsInt64>  *network, const string file_name, const bool skip_self_loops, const vector<  int64_t                       > &);
 template
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsString> *network, const string file_name, const bool skip_self_loops);
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsString> *network, const string file_name, const bool skip_self_loops, const vector<  string                        > &);
 typedef pair< pair<string, string> , string> ThreeStrings;
 static ThreeStrings parseLine(const string &lineOrig);
 class MyVSG;
@@ -159,7 +159,7 @@ struct EmptyOrMissingFile : public std :: exception {
 };
 
 template <class NodeNameT>
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_network, const string file_name, const bool skip_self_loops) {
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_network, const string file_name, const bool skip_self_loops, const vector<typename NodeNameT :: value_type> &preload_node_names) {
 	assert(modifiable_network && modifiable_network->ordered_node_names.empty());
 	/*
 	 * This will make *three* passes:
@@ -175,6 +175,10 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 		}
 		string line;
 		set<t> set_of_node_names; // This will store all the node names.
+		{ // preload_node_names is a set of names that should be included, even if they don't have any edges
+			for(int i=0; i<static_cast<int>(preload_node_names.size()); i++)
+				set_of_node_names.insert(preload_node_names.at(i));
+		}
 		while( getline(f, line) ) {
 			// There might be a '\r' at the end of this line (dammit!)
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
@@ -311,13 +315,19 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 	if(verbose) graph :: saving :: print_Network_to_screen(modifiable_network);
 }
 
-std :: auto_ptr< graph :: NetworkInt64 > make_Network_from_edge_list_int64 (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops) throw(BadlyFormattedLine) { ModifiableNetwork<NodeNameIsInt64> *network = new ModifiableNetwork<NodeNameIsInt64>(directed, weighted);
-	read_edge_list_from_file<NodeNameIsInt64> (network, file_name, skip_self_loops);
+std :: auto_ptr< graph :: NetworkInt64 > make_Network_from_edge_list_int64 (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops, const int32_t minimum_number_of_nodes) throw(BadlyFormattedLine) {
+	ModifiableNetwork<NodeNameIsInt64> *network = new ModifiableNetwork<NodeNameIsInt64>(directed, weighted);
+	vector<int64_t> preload_node_names;
+	for(int i=0; i< minimum_number_of_nodes; i++) {
+		preload_node_names.push_back(i);
+	}
+	read_edge_list_from_file<NodeNameIsInt64> (network, file_name, skip_self_loops, preload_node_names);
 	return auto_ptr< graph :: NetworkInt64 >(network);
 }
 std :: auto_ptr< graph :: NetworkString > make_Network_from_edge_list_string (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops) throw(BadlyFormattedLine) {
 	ModifiableNetwork<NodeNameIsString> *network = new ModifiableNetwork<NodeNameIsString>(directed, weighted);
-	read_edge_list_from_file<NodeNameIsString> (network, file_name, skip_self_loops);
+	vector<string> preload_node_names;
+	read_edge_list_from_file<NodeNameIsString> (network, file_name, skip_self_loops, preload_node_names);
 	return auto_ptr< graph :: NetworkString >(network);
 }
 
