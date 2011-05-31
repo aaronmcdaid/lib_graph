@@ -28,6 +28,7 @@ public:
 		const std :: vector<int32_t> & neigh_nodes = this->neighbouring_nodes_in_order(node_id_1);
 		return std :: binary_search(neigh_nodes.begin(), neigh_nodes.end(), node_id_2);
 	}
+	virtual int32_t number_of_self_loops() const = 0;
 };
 
 class neighbouring_rel_id_iterator : public std :: iterator< std :: forward_iterator_tag, const int32_t> { // given a node_id, we can iterate over its neighbours and get the node_id of them

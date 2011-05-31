@@ -59,8 +59,9 @@ public:
 	std :: auto_ptr<const graph :: bloom :: BloomAreConnected> bloom;
 	std :: tr1 :: unordered_set< pair<int32_t, int32_t>, hash_pair_of_ints > uset_of_connected_nodes;
 #endif
+	int32_t _number_of_self_loops; // will be set to true during loading if necessary
 
-	MyVSG () {
+	MyVSG () : _number_of_self_loops(0) {
 	}
 
 	int numNodes() const { return this->N; }
@@ -88,6 +89,9 @@ public:
 		// return via_binary_search;
 	}
 #endif
+	virtual int32_t number_of_self_loops() const {
+		return _number_of_self_loops;
+	}
 };
 
 template <class NodeNameT>
@@ -185,6 +189,7 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 	}
 
 	vector< pair<int32_t,int32_t> > tmp_ordered_relationships;
+	int counting_self_loops = 0;
 	{ // second pass. Find all the distinct relationships (node_id_1, node_id_2; where node_id_1 <= node_id_2)
 		ifstream f(file_name.c_str(), ios_base :: in | ios_base :: binary);
 		string line;
@@ -196,6 +201,9 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 			int32_t another_node_id = modifiable_network->find_ordered_node_names_offset( NodeNameT :: fromString(t.first.second) );
 			if(one_node_id > another_node_id)
 				swap(one_node_id, another_node_id);
+			if(one_node_id == another_node_id) {
+				++ counting_self_loops;
+			}
 			set_of_relationships.insert( make_pair(one_node_id, another_node_id) );
 			if(verbose) PP2(one_node_id, another_node_id);
 		}
@@ -260,6 +268,7 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 	}
 
 	MyVSG * tmp_plain_graph = new MyVSG();
+	tmp_plain_graph->_number_of_self_loops = counting_self_loops;
 	tmp_plain_graph->ordered_relationships.swap(tmp_ordered_relationships);
 	tmp_plain_graph->node_to_relationships_map.swap(tmp_node_to_relationships_map);
 	tmp_plain_graph->node_to_neighbours_map.swap(tmp_node_to_neighbours_map);
