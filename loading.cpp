@@ -108,10 +108,12 @@ struct ModifiableNetwork : public NetworkInterface<NodeNameT> { // NetworkInterf
 };
 template<>
 std :: string ModifiableNetwork<NodeNameIsString> :: node_name_as_string(int32_t node_id) const {
+	assert(node_id >= 0 && node_id < this->numNodes());
 	return this->ordered_node_names.at(node_id);
 }
 template<>
 std :: string ModifiableNetwork<NodeNameIsInt64> :: node_name_as_string(int32_t node_id) const {
+	assert(node_id >= 0 && node_id < this->numNodes());
 	std :: ostringstream o;
 	o << this->ordered_node_names.at(node_id);
 	return o.str();
