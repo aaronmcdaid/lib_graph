@@ -1,4 +1,5 @@
 #include "weights.hpp"
+#include <cstdlib>
 
 using namespace std;
 

@@ -58,9 +58,9 @@ struct DirectedLDoubleWeights {
 			}
 			std :: istringstream oss(weight);
 			long double w = 0;
-			assert(oss.peek() != EOF);
+			assert(oss.good());
 			oss >> w;
-			assert(oss.peek() == EOF);
+			assert(!oss.fail());
 			if(highToLow) {
 				this->second = w;
 			} else {
@@ -113,9 +113,9 @@ struct WeightNoDir {
 			}
 			std :: istringstream oss(weight);
 			long double w = 0;
-			assert(oss.peek() != EOF);
+			assert(oss.good());
 			oss >> w;
-			assert(oss.peek() == EOF);
+			assert(!oss.fail());
 			this->weight = w;
 		}
 		long double getl2h() const {
