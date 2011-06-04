@@ -29,11 +29,11 @@ static const bool verbose = false;
 template <class NodeNameT>
 struct ModifiableNetwork;
 template <class NodeNameT>
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *network, const string file_name);
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *network, const string file_name, const bool skip_self_loops);
 template
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsInt64> *network, const string file_name);
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsInt64> *network, const string file_name, const bool skip_self_loops);
 template
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsString> *network, const string file_name);
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsString> *network, const string file_name, const bool skip_self_loops);
 typedef pair< pair<string, string> , string> ThreeStrings;
 static ThreeStrings parseLine(const string &lineOrig);
 class MyVSG;
@@ -159,7 +159,7 @@ struct EmptyOrMissingFile : public std :: exception {
 };
 
 template <class NodeNameT>
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_network, const string file_name) {
+static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_network, const string file_name, const bool skip_self_loops) {
 	assert(modifiable_network && modifiable_network->ordered_node_names.empty());
 	/*
 	 * This will make *three* passes:
@@ -179,6 +179,8 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 			// There might be a '\r' at the end of this line (dammit!)
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
 			ThreeStrings t = parseLine(line);
+			if(skip_self_loops && t.first.first == t.first.second)
+				continue;
 			set_of_node_names.insert( NodeNameT :: fromString(t.first.first) );
 			set_of_node_names.insert( NodeNameT :: fromString(t.first.second) );
 		}
@@ -197,6 +199,8 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 		while( getline(f, line) ) {
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
 			ThreeStrings t = parseLine(line);
+			if(skip_self_loops && t.first.first == t.first.second)
+				continue;
 			int32_t one_node_id = modifiable_network->find_ordered_node_names_offset( NodeNameT :: fromString(t.first.first)  );
 			int32_t another_node_id = modifiable_network->find_ordered_node_names_offset( NodeNameT :: fromString(t.first.second) );
 			if(one_node_id > another_node_id)
@@ -252,6 +256,8 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
 			if(verbose) PP(line);
 			ThreeStrings t = parseLine(line);
+			if(skip_self_loops && t.first.first == t.first.second)
+				continue;
 			if(verbose) PP3(t.first.first, t.first.second, t.second);
 			const int32_t source_node_id = modifiable_network->find_ordered_node_names_offset( NodeNameT :: fromString(t.first.first)  );
 			const int32_t target_node_id = modifiable_network->find_ordered_node_names_offset( NodeNameT :: fromString(t.first.second) );
@@ -305,13 +311,13 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 	if(verbose) graph :: saving :: print_Network_to_screen(modifiable_network);
 }
 
-std :: auto_ptr< graph :: NetworkInt64 > make_Network_from_edge_list_int64 (const std :: string file_name, const bool directed, const bool weighted) throw(BadlyFormattedLine) { ModifiableNetwork<NodeNameIsInt64> *network = new ModifiableNetwork<NodeNameIsInt64>(directed, weighted);
-	read_edge_list_from_file<NodeNameIsInt64> (network, file_name);
+std :: auto_ptr< graph :: NetworkInt64 > make_Network_from_edge_list_int64 (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops) throw(BadlyFormattedLine) { ModifiableNetwork<NodeNameIsInt64> *network = new ModifiableNetwork<NodeNameIsInt64>(directed, weighted);
+	read_edge_list_from_file<NodeNameIsInt64> (network, file_name, skip_self_loops);
 	return auto_ptr< graph :: NetworkInt64 >(network);
 }
-std :: auto_ptr< graph :: NetworkString > make_Network_from_edge_list_string (const std :: string file_name, const bool directed, const bool weighted) throw(BadlyFormattedLine) {
+std :: auto_ptr< graph :: NetworkString > make_Network_from_edge_list_string (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops) throw(BadlyFormattedLine) {
 	ModifiableNetwork<NodeNameIsString> *network = new ModifiableNetwork<NodeNameIsString>(directed, weighted);
-	read_edge_list_from_file<NodeNameIsString> (network, file_name);
+	read_edge_list_from_file<NodeNameIsString> (network, file_name, skip_self_loops);
 	return auto_ptr< graph :: NetworkString >(network);
 }
 
