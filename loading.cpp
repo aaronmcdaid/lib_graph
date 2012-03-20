@@ -324,9 +324,16 @@ std :: auto_ptr< graph :: NetworkInt64 > make_Network_from_edge_list_int64 (cons
 	read_edge_list_from_file<NodeNameIsInt64> (network, file_name, skip_self_loops, preload_node_names);
 	return auto_ptr< graph :: NetworkInt64 >(network);
 }
-std :: auto_ptr< graph :: NetworkString > make_Network_from_edge_list_string (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops) throw(BadlyFormattedLine) {
+std :: auto_ptr< graph :: NetworkString > make_Network_from_edge_list_string (const std :: string file_name, const bool directed, const bool weighted, const bool skip_self_loops, const char * preload_these_names) throw(BadlyFormattedLine) {
 	ModifiableNetwork<NodeNameIsString> *network = new ModifiableNetwork<NodeNameIsString>(directed, weighted);
 	vector<string> preload_node_names;
+	if(preload_these_names) {
+		ifstream to_be_preloaded(preload_these_names);
+		string line;
+		while(to_be_preloaded >> line) {
+			preload_node_names.push_back(line);
+		}
+	}
 	read_edge_list_from_file<NodeNameIsString> (network, file_name, skip_self_loops, preload_node_names);
 	return auto_ptr< graph :: NetworkString >(network);
 }
