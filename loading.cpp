@@ -109,6 +109,9 @@ struct ModifiableNetwork : public NetworkInterface<NodeNameT> { // NetworkInterf
 		return offset;
 	}
 	virtual std :: string node_name_as_string(int32_t node_id) const;
+	virtual bool was_string_data_not_int() const {
+		return NodeNameT :: was_string_data_not_int;
+	}
 };
 template<>
 std :: string ModifiableNetwork<NodeNameIsString> :: node_name_as_string(int32_t node_id) const {

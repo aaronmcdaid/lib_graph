@@ -36,6 +36,7 @@ typedef NetworkInterface<NodeNameIsString> NetworkString;
 
 struct NodeNameIsInt64 {
 	typedef int64_t value_type;
+	static const bool was_string_data_not_int = false;
 	inline static value_type fromString(const std :: string &s) {
 		assert(!s.empty());
 		value_type i;
@@ -52,6 +53,7 @@ struct NodeNameIsInt64 {
 };
 struct NodeNameIsString {
 	typedef std :: string value_type;
+	static const bool was_string_data_not_int = true;
 	inline static value_type fromString(const std :: string &s) {
 		if(s.empty())
 		throw BadlyFormattedNodeName("non-empty string", s);
@@ -61,6 +63,7 @@ struct NodeNameIsString {
 
 struct NetworkInterfaceConvertedToString  { // Any NodeNameT (int or string) should be able to implement this.
 	virtual std :: string node_name_as_string(int32_t node_id) const = 0;
+	virtual bool was_string_data_not_int() const = 0;
 	virtual const graph :: VerySimpleGraphInterface * get_plain_graph() const = 0;
 	virtual int32_t numNodes() const { return this->get_plain_graph()->numNodes(); } // make these pure, and hide the members from this interface
 	virtual int32_t numRels()  const { return this->get_plain_graph()->numRels(); }
