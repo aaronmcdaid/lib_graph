@@ -61,7 +61,7 @@ public:
 #endif
 	int32_t _number_of_self_loops; // will be set to true during loading if necessary
 
-	MyVSG () : _number_of_self_loops(0) {
+	MyVSG () : N(0), R(0),_number_of_self_loops(0) {
 	}
 
 	int numNodes() const { return this->N; }
