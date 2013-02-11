@@ -6,3 +6,4 @@
 #define unless(x) if(!(x))
 #define DYINGWORDS(x) for (int klsdjfslkfj = (x) ? 0 : 1; klsdjfslkfj!=0; klsdjfslkfj--, ({ assert (x); }) )
 #define VERYCLOSE(a,b) (1e-10 > fabs((a)-(b)))
+#define ELAPSED() (double(clock()) / CLOCKS_PER_SEC)
