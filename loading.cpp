@@ -185,6 +185,8 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 		while( getline(f, line) ) {
 			// There might be a '\r' at the end of this line (dammit!)
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
+			if(line.length()==0 || line.at(0) == '#')
+				continue;
 			ThreeStrings t = parseLine(line);
 			if(skip_self_loops && t.first.first == t.first.second)
 				continue;
@@ -205,6 +207,8 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 		set< pair<int32_t,int32_t> > set_of_relationships; // every edge, ignoring direction, will be included here
 		while( getline(f, line) ) {
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
+			if(line.length()==0 || line.at(0) == '#')
+				continue;
 			ThreeStrings t = parseLine(line);
 			if(skip_self_loops && t.first.first == t.first.second)
 				continue;
@@ -261,6 +265,8 @@ static void read_edge_list_from_file(ModifiableNetwork<NodeNameT> *modifiable_ne
 		string line;
 		while( getline(f, line) ) {
 			if(!line.empty() && *line.rbegin() == '\r') { line.erase( line.length()-1, 1); }
+			if(line.length()==0 || line.at(0) == '#')
+				continue;
 			if(verbose) PP(line);
 			ThreeStrings t = parseLine(line);
 			if(skip_self_loops && t.first.first == t.first.second)
@@ -345,7 +351,7 @@ BadlyFormattedLine :: BadlyFormattedLine(int32_t _line_number, std :: string _ba
 }
 const char* BadlyFormattedLine :: what() const throw() {
 	ostringstream s;
-	s << "Error: badly formatted line in edge list at line " << this->line_number << ". ExitinG. \"" << this->bad_line << "\"" << endl;
+	s << "Error: badly formatted line in edge list at line " << this->line_number << ". Exiting. \"" << this->bad_line << "\"" << endl;
 	return s.str().c_str();
 }
 BadlyFormattedLine :: ~ BadlyFormattedLine() throw() {
