@@ -31,9 +31,9 @@ struct ModifiableNetwork;
 template <class NodeNameT>
 static void read_edge_list_from_file(ModifiableNetwork<NodeNameT>        *network, const string file_name, const bool skip_self_loops, const vector<typename NodeNameT :: value_type> &);
 template
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsInt64>  *network, const string file_name, const bool skip_self_loops, const vector<  int64_t                       > &);
+void read_edge_list_from_file(ModifiableNetwork<NodeNameIsInt64>  *network, const string file_name, const bool skip_self_loops, const vector<  int64_t                       > &);
 template
-static void read_edge_list_from_file(ModifiableNetwork<NodeNameIsString> *network, const string file_name, const bool skip_self_loops, const vector<  string                        > &);
+void read_edge_list_from_file(ModifiableNetwork<NodeNameIsString> *network, const string file_name, const bool skip_self_loops, const vector<  string                        > &);
 typedef pair< pair<string, string> , string> ThreeStrings;
 static ThreeStrings parseLine(const string &lineOrig);
 class MyVSG;
